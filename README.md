@@ -66,3 +66,17 @@ python test_ml_debug.py
 ## 📄 Documentación y Fundamentos
 
 La justificación teórica, los diagramas de arquitectura y los resultados experimentales se encuentran detallados en el archivo Collaboration.pdf. 
+
+---
+
+### ⚠️ Nota Técnica: Dependencias de Inferencia (ONNX Runtime)
+
+El motor de predicción del **BioPhys-Tech Lab** utiliza **ONNX Runtime** para optimizar la ejecución de los modelos de Gradient Boosting, logrando una reducción significativa en la latencia de inferencia.
+
+Para mantener la eficiencia y seguridad de la infraestructura, se han tomado las siguientes decisiones de diseño:
+
+**Construcción en Etapas (Multi-stage):** El `Dockerfile` utiliza un builder con `gcc` para compilar dependencias, pero la imagen final es de tipo `slim` para minimizar la superficie de ataque y el peso del contenedor.
+**Librerías Compartidas:** Dependiendo del entorno de ejecución (OS host), la inferencia con ONNX puede requerir librerías compartidas de C++ (como `libgomp1`). Si el contenedor arroja un error de carga de librerías en sistemas operativos anfitriones muy restrictivos, se recomienda instalar dichas dependencias en la capa final o gestionarlas a nivel de orquestador.
+**Optimización de Recursos:** El uso de imágenes ligeras asegura que el servicio pueda escalar rápidamente en entornos de nube sin el "overhead" de herramientas de compilación innecesarias en producción.
+
+---
